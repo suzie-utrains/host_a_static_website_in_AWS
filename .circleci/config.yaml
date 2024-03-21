@@ -1,0 +1,70 @@
+version: 2
+
+jobs:
+
+  build_website:
+    executor: small_cpu39
+    working_directory: ~/ParlAI/website
+    steps:
+      - website:
+          deploy: false
+
+  initialization:
+    working_directory: ~/ParlAI/build
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    steps:
+      - checkout
+      - run:
+          name: terraform init 
+          command: |
+            terraform init  
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  validate:
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform validate
+          command: |
+            terraform validate
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  apply:
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform apply
+          command: |
+            terraform apply -auto-approve 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+ 
+workflows:
+  version: 2
+  plan_approve_apply:
+    jobs:
+      - initialization
+      - validate:
+          requires:
+            - initialization
+      - hold-apply:
+          type: approval
+          requires:
+            - validate
+      - apply:
+          requires:
+            - hold-apply
