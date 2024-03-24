@@ -31,7 +31,6 @@ resource "aws_s3_bucket_object" "upload_files" {
   key    = each.value
   source = "/${var.cp-path}/${each.value}"
   content_type = "txt/html"
-  etag   = filemd5("/${var.cp-path}/${each.value}") # etag makes the file update when it changes
  
 depends_on = [aws_s3_bucket.bucket1]
  
