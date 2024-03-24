@@ -23,6 +23,20 @@ resource "aws_s3_bucket" "bucket1" {
 
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
 
+locals {
+  mime_types = {
+    "css"  = "text/css"
+    "html" = "text/html"
+    "ico"  = "image/vnd.microsoft.icon"
+    "js"   = "application/javascript"
+    "json" = "application/json"
+    "map"  = "application/json"
+    "png"  = "image/png"
+    "svg"  = "image/svg+xml"
+    "txt"  = "text/plain"
+  }
+}
+
 resource "aws_s3_bucket_object" "upload_files" {
 
   for_each = fileset("${var.cp-path}", "**/*")
@@ -30,7 +44,8 @@ resource "aws_s3_bucket_object" "upload_files" {
   bucket = aws_s3_bucket.bucket1.id
   key    = each.value
   source = "/${var.cp-path}/${each.value}"
-  content_type = "/"
+  content_type = lookup(tomap(local.mime_types), element(split(".", each.key), length(split(".", each.key)) - 1))
+  etag         = filemd5("${var.cp-path}/${each.key}")
  
 depends_on = [aws_s3_bucket.bucket1]
  
