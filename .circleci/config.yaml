@@ -3,7 +3,7 @@ version: 2
 jobs:
 
   initialization:
-    working_directory: ~/ParlAI/build
+    working_directory: ~/host_a_static_website_in_AWS
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
