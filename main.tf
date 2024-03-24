@@ -27,7 +27,7 @@ resource "aws_s3_bucket_object" "upload_files" {
 
   for_each = fileset("${var.cp-path}", "**/*")
 
-  bucket = aws_s3_bucket.bucket1.bucket
+  bucket = aws_s3_bucket.bucket1.id
   key    = each.value
   source = "/${var.cp-path}/${each.value}"
   content_type = "txt/html"
