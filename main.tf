@@ -30,7 +30,6 @@ resource "aws_s3_bucket_object" "upload_files" {
   bucket = aws_s3_bucket.bucket1.id
   key    = each.value
   source = "/${var.cp-path}/${each.value}"
-  content_type = "txt/html"
  
 depends_on = [aws_s3_bucket.bucket1]
  
