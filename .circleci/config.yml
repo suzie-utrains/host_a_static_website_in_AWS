@@ -1,5 +1,8 @@
 version: 2
 
+orbs:
+  aws-cli: circleci/aws-cli@4.0
+
 jobs:
 
   initialization:
@@ -63,7 +66,7 @@ jobs:
             - .
  
 workflows:
-  version: 2
+  aws-cli:
   plan_approve_apply:
     jobs:
       - initialization
