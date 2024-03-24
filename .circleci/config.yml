@@ -8,11 +8,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Terraform - fmt, Init and Plan
+          name: Terraform - fmt and Init 
           command: |
             terraform fmt -recursive .
-            terraform init -input=false
-            terraform plan -out=tfapply.out 
+            terraform init -input=false 
       - persist_to_workspace:
           root: .
           paths:
@@ -26,21 +25,7 @@ jobs:
       - run:
           name: Terraform - Apply
           command: |
-            terraform apply -auto-approve tfapply.out
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-  plan-destroy:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Terraform - Creating Destroy Plan
-          command: |
-            terraform plan -destroy -out=tfdestroy.out
+            terraform apply -auto-approve 
       - persist_to_workspace:
           root: .
           paths:
@@ -54,7 +39,7 @@ jobs:
         - run:
             name: Terraform - Destroy
             command: |
-              terraform apply -auto-approve tfdestroy.out
+              terraform destroy -auto-approve 
 
 workflows:
   terraform_plan_apply_destroy_sftp:
@@ -65,13 +50,10 @@ workflows:
       - apply:
           requires:
             - hold-apply
-      - plan-destroy:
-          requires:
-            - apply
       - hold-destroy:
           type: approval
           requires:
-            - plan-destroy
+            - apply
       - destroy:
           requires:
             - hold-destroy
