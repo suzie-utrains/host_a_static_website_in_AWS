@@ -1,17 +1,32 @@
-version: 2.1
+version: 2
 
 jobs:
-  plan-apply:
+
+  initialization:
     working_directory: ~/host_a_static_website_in_AWS
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - checkout
       - run:
-          name: Terraform - fmt and Init 
+          name: terraform init 
           command: |
-            terraform fmt -recursive .
-            terraform init -input=false 
+            terraform init  
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  validate:
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    parallelism : 2
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform validate
+          command: |
+            terraform validate
       - persist_to_workspace:
           root: .
           paths:
@@ -19,11 +34,12 @@ jobs:
   apply:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    parallelism : 2
     steps:
       - attach_workspace:
           at: .
       - run:
-          name: Terraform - Apply
+          name: terraform apply
           command: |
             terraform apply -auto-approve 
       - persist_to_workspace:
@@ -31,22 +47,33 @@ jobs:
           paths:
             - .
   destroy:
-      docker:
-        - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-      steps:
-        - attach_workspace:
-            at: .
-        - run:
-            name: Terraform - Destroy
-            command: |
-              terraform destroy -auto-approve 
-
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    parallelism : 2
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: terraform destroy
+          command: |
+            terraform destroy -auto-approve 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+ 
 workflows:
-  terraform_plan_apply_destroy_sftp:
+  version: 2
+  plan_approve_apply:
     jobs:
-      - plan-apply
+      - initialization
+      - validate:
+          requires:
+            - initialization
       - hold-apply:
           type: approval
+          requires:
+            - validate
       - apply:
           requires:
             - hold-apply
@@ -57,3 +84,4 @@ workflows:
       - destroy:
           requires:
             - hold-destroy
+    
