@@ -23,14 +23,16 @@ resource "aws_s3_bucket" "bucket1" {
 
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
 
-resource "null_resource" "upload_files" {
+resource "aws_s3_bucket_object" "upload_files" {
 
-  provisioner "local-exec"  {
-      command = <<EOT
-        aws s3 sync ${var.cp-path} s3://${aws_s3_bucket.bucket1.bucket}/ 
-      EOT
-}
+  for_each = fileset("${var.cp-path}", "**/*")
 
+  bucket = aws_s3_bucket.bucket1.bucket
+  key    = each.value
+  source = "/${var.cp-path}/${each.value}"
+  content_type = "txt/html"
+  etag   = filemd5("/${var.cp-path}/${each.value}") # etag makes the file update when it changes
+ 
 depends_on = [aws_s3_bucket.bucket1]
  
 }
@@ -133,7 +135,7 @@ resource "aws_cloudfront_distribution" "web-distribution" {
 
   price_class = "PriceClass_200"
 
-  depends_on = [ aws_s3_bucket.bucket1 , null_resource.upload_files , aws_s3_bucket_website_configuration.bucket , aws_s3_bucket_public_access_block.bucket_access_block , aws_s3_bucket_policy.bucket_policy]
+  depends_on = [ aws_s3_bucket.bucket1 , aws_s3_bucket_object.upload_files , aws_s3_bucket_website_configuration.bucket , aws_s3_bucket_public_access_block.bucket_access_block , aws_s3_bucket_policy.bucket_policy]
   
 }
 
