@@ -32,7 +32,7 @@ resource "aws_s3_bucket_object" "upload_files" {
   for_each = fileset("${var.cp-path}", "**/*")
 
   bucket = aws_s3_bucket.bucket1.id
-  key    = each.key
+  key    = each.value
   source = "/${var.cp-path}/${each.value}"
   content_type = lookup(local.mime_types, regex("\\.[^.]+$", each.key), null)
   etag         = filemd5("${var.cp-path}/${each.key}")
