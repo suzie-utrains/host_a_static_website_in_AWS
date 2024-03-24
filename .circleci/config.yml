@@ -19,6 +19,9 @@ jobs:
   validate:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+        environment:
+          AWS_ACCESS_KEY: $AWS_ACCESS_KEY
+          MY_ENV_VAR_2: $AWS_SECRET_KEY
     parallelism : 2
     steps:
       - attach_workspace:
