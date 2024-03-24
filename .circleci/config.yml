@@ -12,7 +12,7 @@ jobs:
           command: |
             terraform fmt -recursive .
             terraform init -input=false
-            terraform plan -out tfapply 
+            terraform plan -out=tfapply 
       - persist_to_workspace:
           root: .
           paths:
@@ -40,7 +40,7 @@ jobs:
       - run:
           name: Terraform - Creating Destroy Plan
           command: |
-            terraform plan -destroy -out tfdestroy
+            terraform plan -destroy -out=tfdestroy
       - persist_to_workspace:
           root: .
           paths:
