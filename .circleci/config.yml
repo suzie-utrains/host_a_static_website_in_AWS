@@ -69,13 +69,9 @@ workflows:
       - validate:
           requires:
             - initialization
-      - hold-apply:
-          type: approval
-          requires:
-            - validate
       - apply:
           requires:
-            - hold-apply
+            - validate
       - hold-destroy:
           type: approval
           requires:
