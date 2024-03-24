@@ -2,13 +2,6 @@ version: 2
 
 jobs:
 
-  build_website:
-    executor: small_cpu39
-    working_directory: ~/ParlAI/website
-    steps:
-      - website:
-          deploy: false
-
   initialization:
     working_directory: ~/ParlAI/build
     docker:
