@@ -19,6 +19,7 @@ jobs:
   validate:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    parallelism : 2
     steps:
       - attach_workspace:
           at: .
@@ -33,6 +34,7 @@ jobs:
   apply:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    parallelism : 2
     steps:
       - attach_workspace:
           at: .
