@@ -22,6 +22,11 @@ resource "aws_s3_bucket" "bucket1" {
   
 }
 
+resource "aws_s3_bucket_acl" "example" {
+  bucket = aws_s3_bucket.bucket1.id
+  acl    = "private"
+}
+
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
 
 resource "null_resource" "upload_files" {
