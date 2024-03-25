@@ -41,6 +41,7 @@ jobs:
       - run:
           name: terraform apply
           command: |
+            apk add -U --no-cache jq
             terraform apply -auto-approve 
       - persist_to_workspace:
           root: .
