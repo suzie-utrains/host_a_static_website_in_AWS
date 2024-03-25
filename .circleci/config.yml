@@ -6,6 +6,7 @@ jobs:
     working_directory: ~/host_a_static_website_in_AWS
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: cimg/aws:2024.03
     steps:
       - checkout
       - run:
@@ -19,6 +20,7 @@ jobs:
   validate:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: cimg/aws:2024.03
     parallelism : 2
     steps:
       - attach_workspace:
@@ -34,6 +36,7 @@ jobs:
   apply:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: cimg/aws:2024.03
     parallelism : 2
     steps:
       - attach_workspace:
@@ -50,6 +53,7 @@ jobs:
   destroy:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: cimg/aws:2024.03
     parallelism : 2
     steps:
       - attach_workspace:
