@@ -6,7 +6,6 @@ jobs:
     working_directory: ~/host_a_static_website_in_AWS
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-      - image: cimg/aws:2024.03
     steps:
       - checkout
       - run:
@@ -20,7 +19,6 @@ jobs:
   validate:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-      - image: cimg/aws:2024.03
     parallelism : 2
     steps:
       - attach_workspace:
@@ -36,7 +34,6 @@ jobs:
   apply:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-      - image: cimg/aws:2024.03
     parallelism : 2
     steps:
       - attach_workspace:
@@ -44,7 +41,8 @@ jobs:
       - run:
           name: terraform apply
           command: |
-            apk add -U --no-cache jq
+            apk --no-cache add python3 py3-pip  
+            pip3 install --upgrade pip \ && pip3 install --no-cache-dir awscli
             terraform apply -auto-approve 
       - persist_to_workspace:
           root: .
@@ -53,7 +51,6 @@ jobs:
   destroy:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-      - image: cimg/aws:2024.03
     parallelism : 2
     steps:
       - attach_workspace:
@@ -61,6 +58,8 @@ jobs:
       - run:
           name: terraform destroy
           command: |
+            apk --no-cache add python3 py3-pip  
+            pip3 install --upgrade pip \ && pip3 install --no-cache-dir awscli
             terraform destroy -auto-approve 
       - persist_to_workspace:
           root: .
