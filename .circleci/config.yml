@@ -41,8 +41,7 @@ jobs:
       - run:
           name: terraform apply
           command: |
-            apk --no-cache add python3 py3-pip  
-            pip3 install --upgrade pip \ && pip3 install --no-cache-dir awscli
+            apk add --no-cache aws-cli
             terraform apply -auto-approve 
       - persist_to_workspace:
           root: .
@@ -58,8 +57,7 @@ jobs:
       - run:
           name: terraform destroy
           command: |
-            apk --no-cache add python3 py3-pip  
-            pip3 install --upgrade pip \ && pip3 install --no-cache-dir awscli
+            apk add --no-cache aws-cli
             terraform destroy -auto-approve 
       - persist_to_workspace:
           root: .
