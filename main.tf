@@ -24,7 +24,18 @@ resource "aws_s3_bucket" "bucket1" {
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
 
 locals {
-  mime_types = jsondecode(file("mime.json"))
+  content_type_map = {
+   "css"   = "text/css"
+    "html" = "text/html"
+    "ico"  = "image/vnd.microsoft.icon"
+    "js"   = "application/javascript"
+    "json" = "application/json"
+    "map"  = "application/json"
+    "png"  = "image/png"
+    "svg"  = "image/svg+xml"
+    "txt"  = "text/plain"
+    "jpg"  = "image/jpg"
+  }
 }
 
 resource "aws_s3_bucket_object" "upload_files" {
@@ -34,7 +45,7 @@ resource "aws_s3_bucket_object" "upload_files" {
   bucket = aws_s3_bucket.bucket1.id
   key    = each.key
   source = "/${var.cp-path}/${each.value}"
-  content_type = lookup(local.mime_types, regex("\\.[^.]+$", each.key), null)
+  content_type = lookup(local.content_type_map, split(".", "${path.module}/travel-agency-html-template/${each.value}")[1], "text/html")
   etag         = filemd5("${var.cp-path}/${each.key}")
  
 depends_on = [aws_s3_bucket.bucket1]

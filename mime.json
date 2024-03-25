@@ -7,5 +7,6 @@
     "map"  : "application/json",
     "png"  : "image/png",
     "svg"  : "image/svg+xml",
-    "txt"  : "text/plain"
+    "txt"  : "text/plain",
+    "jpg"  : "image/jpg"
   }
