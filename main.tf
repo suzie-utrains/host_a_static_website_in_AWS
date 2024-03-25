@@ -24,28 +24,24 @@ resource "aws_s3_bucket" "bucket1" {
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
 
 locals {
-  content_type_map = {
-   "css"   = "text/css"
-    "html" = "text/html"
-    "ico"  = "image/vnd.microsoft.icon"
-    "js"   = "application/javascript"
-    "json" = "application/json"
-    "map"  = "application/json"
-    "png"  = "image/png"
-    "svg"  = "image/svg+xml"
-    "txt"  = "text/plain"
-    "jpg"  = "image/jpg"
+  website_files = fileset("${var.cp-path}", "**/*")
+}
+data "external" "get_mime" {
+  for_each = local.website_files
+  program  = ["bash", "./mime.sh"]
+  query = {
+    filepath : "${var.cp-path}/${each.key}"
   }
 }
 
 resource "aws_s3_bucket_object" "upload_files" {
 
-  for_each = fileset("${var.cp-path}", "**/*")
+  for_each = local.website_files
 
   bucket = aws_s3_bucket.bucket1.id
   key    = each.value
   source = "/${var.cp-path}/${each.value}"
-  content_type = lookup(local.content_type_map, split(".", "/${var.cp-path}/${each.value}")[1], "text/html")
+  content_type = data.external.get_mime[each.key].result.mime
   etag         = filemd5("${var.cp-path}/${each.key}")
  
 depends_on = [aws_s3_bucket.bucket1]
