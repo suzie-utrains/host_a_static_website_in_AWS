@@ -28,7 +28,7 @@ locals {
 }
 data "external" "get_mime" {
   for_each = local.website_files
-  program  = ["/bin/bash", "-c", "./mime.sh"]
+  program  = ["/bin/sh", "-c", "./mime.sh"]
   query = {
     filepath : "${var.cp-path}/${each.key}"
   }
