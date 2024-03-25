@@ -45,7 +45,7 @@ resource "aws_s3_bucket_object" "upload_files" {
   bucket = aws_s3_bucket.bucket1.id
   key    = each.value
   source = "/${var.cp-path}/${each.value}"
-  content_type = lookup(local.content_type_map, split(".", "${path.module}/travel-agency-html-template/${each.value}")[1], "text/html")
+  content_type = lookup(local.content_type_map, split(".", "/${var.cp-path}/${each.value}")[1], "text/html")
   etag         = filemd5("${var.cp-path}/${each.key}")
  
 depends_on = [aws_s3_bucket.bucket1]
