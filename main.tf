@@ -46,7 +46,7 @@ resource "aws_s3_bucket_acl" "example" {
   ]
 
   bucket = aws_s3_bucket.bucket1.id
-  acl    = "public-read"
+  acl    = "public-read-write"
 }
 
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
