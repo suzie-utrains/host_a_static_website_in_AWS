@@ -22,6 +22,13 @@ resource "aws_s3_bucket" "bucket1" {
   
 }
 
+resource "aws_s3_bucket_public_access_block" "bucket_access_block" {
+  bucket = aws_s3_bucket.bucket1.id
+
+  block_public_acls   = false
+  block_public_policy = false
+}
+
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
 
 resource "null_resource" "upload_files" {
@@ -51,6 +58,7 @@ resource "aws_s3_bucket_website_configuration" "bucket" {
   }
 }
 
+# ~~~~~~~~~~~ Configure public access parameters in the bucket ~~~~~~~
 resource "aws_s3_bucket_public_access_block" "bucket_access_block" {
   bucket = aws_s3_bucket.bucket1.id
 
@@ -65,14 +73,16 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "AllowGetObjects"
     Statement = [
       {
-        Sid       = "AllowPublic"
         Effect    = "Allow"
         Principal = "*"
-        Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.bucket1.arn}/**"
+        Action = [
+          "s3:GetObject"
+        ]
+        Resource = [
+          "${aws_s3_bucket.bucket1.arn}/*"
+        ]
       }
     ]
   })
