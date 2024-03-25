@@ -33,7 +33,7 @@ jobs:
             - .
   apply:
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: docker.mirror.hashicorp/terraform:full
     parallelism : 2
     steps:
       - attach_workspace:
@@ -48,7 +48,7 @@ jobs:
             - .
   destroy:
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: docker.mirror.hashicorp/terraform:full
     parallelism : 2
     steps:
       - attach_workspace:
