@@ -22,7 +22,17 @@ resource "aws_s3_bucket" "bucket1" {
   
 }
 
+# ~~~~~~~~~~~~~~~~~~~~~ Configure the bucket acl ~~~~~~~~~~~~~~~~~~~~~~
+resource "aws_s3_bucket_ownership_controls" "example" {
+  bucket = aws_s3_bucket.bucket1.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_acl" "example" {
+  depends_on = [aws_s3_bucket_ownership_controls.example]
+
   bucket = aws_s3_bucket.bucket1.id
   acl    = "private"
 }
