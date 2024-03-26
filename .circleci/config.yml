@@ -12,7 +12,7 @@ jobs:
           name: terraform init and creating custom plan to apply
           command: |
             terraform init 
-            terraform plan  
+            terraform plan -out plan-to-apply -var-file var.tfvars
       - persist_to_workspace:
           root: .
           paths:
@@ -59,7 +59,8 @@ jobs:
           name: terraform destroy
           command: |
             apk add --no-cache aws-cli
-            terraform destroy -auto-approve 
+            terraform plan -destroy -out plan-to-destroy -var-file var.tfvars
+            terraform apply -auto-approve plan-to-destroy
       - persist_to_workspace:
           root: .
           paths:
