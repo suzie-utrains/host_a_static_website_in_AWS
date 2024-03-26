@@ -72,12 +72,12 @@ resource "aws_s3_bucket_public_access_block" "access-bloc" {
   restrict_public_buckets = false
 
 }
-resource "aws_s3_bucket_acl" "example" {
+resource "aws_s3_bucket_acl" "bucket1-acl" {
 
   bucket = aws_s3_bucket.bucket1.id
   acl    = "public-read"
 
-  depends_on = [ aws_s3_bucket_ownership_controls.rule, aws_s3_bucket_public_access_block.access-bloc]
+  depends_on = [ aws_s3_bucket_ownership_controls.rule, aws_s3_bucket_public_access_block.access-bloc,aws_s3_bucket_acl.bucket1-acl]
 
 }
 
@@ -135,7 +135,7 @@ resource "aws_cloudfront_distribution" "web-distribution" {
 
   price_class = "PriceClass_200"
 
-  depends_on = [ aws_s3_bucket.bucket1 , null_resource.upload_files , aws_s3_bucket_website_configuration.bucket , aws_s3_bucket_public_access_block.bucket_access_block , aws_s3_bucket_policy.bucket_policy]
+  depends_on = [ aws_s3_bucket.bucket1 , null_resource.upload_files ]
   
 }
 
