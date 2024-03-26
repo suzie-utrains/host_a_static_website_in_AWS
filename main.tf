@@ -67,41 +67,19 @@ resource "aws_s3_bucket_ownership_controls" "rule" {
 resource "aws_s3_bucket_public_access_block" "bucket_access_block" {
   bucket = aws_s3_bucket.bucket1.id
 
-  block_public_acls   = false
-  block_public_policy = false
-
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 resource "aws_s3_bucket_acl" "bucket1-acl" {
 
   bucket = aws_s3_bucket.bucket1.id
-  acl    = "private"
+  acl    = "public-read"
 
   depends_on = [ aws_s3_bucket_ownership_controls.rule, aws_s3_bucket_public_access_block.bucket_access_block,aws_s3_bucket_acl.bucket1-acl]
 
 }
-
-# ~~~~~~~~~~~~~~~~~~~~~~ Create the bucket policy ~~~~~~~~~~~~~~~~~~~~~
-
-resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = aws_s3_bucket.bucket1.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect    = "Allow"
-        Principal = "*"
-        Action = [
-          "s3:GetObject"
-        ]
-        Resource = [
-          "${aws_s3_bucket.bucket1.arn}/*"
-        ]
-      }
-    ]
-  })
-}
-
 
 # ~~~~~~~~~~~~~~~~~~~~~~ Configure CloudFont ~~~~~~~~~~~~~~~~~~~~~
 
@@ -157,7 +135,7 @@ resource "aws_cloudfront_distribution" "web-distribution" {
 
   price_class = "PriceClass_200"
 
-  depends_on = [ aws_s3_bucket.bucket1 , null_resource.upload_files, aws_s3_bucket_acl.bucket1-acl, aws_s3_bucket_policy.bucket_policy ]
+  depends_on = [ aws_s3_bucket.bucket1 , null_resource.upload_files, aws_s3_bucket_acl.bucket1-acl ]
   
 }
 
