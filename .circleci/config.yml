@@ -9,9 +9,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: terraform init 
+          name: terraform init and creating custom plan to apply
           command: |
-            terraform init  
+            terraform init 
+            terraform plan  
       - persist_to_workspace:
           root: .
           paths:

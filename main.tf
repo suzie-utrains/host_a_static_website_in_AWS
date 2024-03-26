@@ -1,4 +1,6 @@
 terraform {
+
+  cloud {}
   required_providers {
     aws = {
       source = "hashicorp/aws"
@@ -20,13 +22,6 @@ resource "aws_s3_bucket" "bucket1" {
   bucket = var.bucket_name
   force_destroy = true
   
-}
-
-resource "aws_s3_bucket_public_access_block" "bucket_access_block" {
-  bucket = aws_s3_bucket.bucket1.id
-
-  block_public_acls   = false
-  block_public_policy = false
 }
 
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
@@ -62,8 +57,10 @@ resource "aws_s3_bucket_website_configuration" "bucket" {
 resource "aws_s3_bucket_public_access_block" "bucket_access_block" {
   bucket = aws_s3_bucket.bucket1.id
 
-  block_public_acls   = false
-  block_public_policy = false
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~ Create the bucket policy ~~~~~~~~~~~~~~~~~~~~~
