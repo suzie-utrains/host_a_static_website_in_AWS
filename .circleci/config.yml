@@ -12,22 +12,7 @@ jobs:
           name: terraform init and creating custom plan to apply
           command: |
             terraform init 
-            terraform plan 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-  validate:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    parallelism : 2
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform validate
-          command: |
-            terraform validate
+            terraform validate 
       - persist_to_workspace:
           root: .
           paths:
@@ -70,12 +55,9 @@ workflows:
   plan_approve_apply:
     jobs:
       - initialization
-      - validate:
-          requires:
-            - initialization
       - apply:
           requires:
-            - validate
+            - initialization
       - hold-destroy:
           type: approval
           requires:

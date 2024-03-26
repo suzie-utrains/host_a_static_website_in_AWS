@@ -49,6 +49,9 @@ resource "aws_s3_bucket_website_configuration" "bucket" {
   error_document {
     key = var.file-key
   }
+
+  depends_on = [aws_s3_bucket.bucket1]
+
 }
 
 # ~~~~~~~~~~~ Configure public access parameters in the bucket ~~~~~~~
