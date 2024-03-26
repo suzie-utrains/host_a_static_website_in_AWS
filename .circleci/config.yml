@@ -79,7 +79,7 @@ workflows:
             - validate
       - apply:
           requires:
-            - validate
+            - hold-apply
       - hold-destroy:
           type: approval
           requires:
