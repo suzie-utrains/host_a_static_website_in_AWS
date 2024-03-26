@@ -43,7 +43,7 @@ jobs:
           name: terraform apply
           command: |
             apk add --no-cache aws-cli
-            terraform apply 
+            terraform apply -auto-approve
       - persist_to_workspace:
           root: .
           paths:
