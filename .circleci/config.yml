@@ -12,7 +12,7 @@ jobs:
           name: terraform init and creating custom plan to apply
           command: |
             terraform init 
-            terraform plan -out plan-to-apply -var-file var.tfvars
+            terraform plan 
       - persist_to_workspace:
           root: .
           paths:
@@ -43,7 +43,7 @@ jobs:
           name: terraform apply
           command: |
             apk add --no-cache aws-cli
-            terraform apply -auto-approve plan-to-apply
+            terraform apply 
       - persist_to_workspace:
           root: .
           paths:
