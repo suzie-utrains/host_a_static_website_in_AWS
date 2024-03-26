@@ -19,7 +19,28 @@ resource "aws_s3_bucket" "bucket1" {
 
   bucket = var.bucket_name
   force_destroy = true
-  
+  policy = <<EOT
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_s3_bucket.bucket1.arn}"
+    }
+  ]
+
+}
+EOT
 }
 
 # ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
