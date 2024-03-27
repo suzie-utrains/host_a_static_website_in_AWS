@@ -22,39 +22,7 @@ resource "aws_s3_bucket" "bucket1" {
   
 }
 
-# ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
-
-resource "null_resource" "upload_files" {
-
-  provisioner "local-exec"  {
-      command = <<EOT
-        aws s3 sync ${var.cp-path} s3://${aws_s3_bucket.bucket1.bucket}/ 
-      EOT
-}
- 
-depends_on = [aws_s3_bucket.bucket1]
- 
-}
-
-
-# ~~~~~~~~~~~ Configure the web hosting parameters in the bucket ~~~~~~~
-
-resource "aws_s3_bucket_website_configuration" "bucket" {
-  bucket = aws_s3_bucket.bucket1.id
-
-  index_document {
-    suffix = var.file-key
-  }
-
-  error_document {
-    key = var.file-key
-  }
-
-  depends_on = [aws_s3_bucket.bucket1]
-
-}
-
-# ~~~~~~~~~~~ Configure public access parameters in the bucket ~~~~~~~
+# ~~~~~~~~~~~ Configure public access parameters in the bucket ~~~~~~~~
 resource "aws_s3_bucket_ownership_controls" "rule" {
 
   bucket = aws_s3_bucket.bucket1.id
@@ -63,7 +31,6 @@ resource "aws_s3_bucket_ownership_controls" "rule" {
   }
 
 }
-
 resource "aws_s3_bucket_public_access_block" "bucket_access_block" {
   bucket = aws_s3_bucket.bucket1.id
 
@@ -86,6 +53,8 @@ resource "aws_s3_bucket_acl" "bucket1-acl" {
 resource "aws_s3_bucket_policy" "allow_access" {
   bucket = aws_s3_bucket.bucket1.id
   policy = data.aws_iam_policy_document.allow_access_from_another_account.json
+
+  depends_on = [ aws_s3_bucket_acl.bucket1-acl ]
 }
 
 data "aws_iam_policy_document" "allow_access_from_another_account" {
@@ -96,8 +65,7 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
     }
 
     actions = [
-      "s3:GetObject",
-      "s3:ListBucket",
+      "s3:*"
     ]
 
     resources = [
@@ -105,6 +73,38 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
       "${aws_s3_bucket.bucket1.arn}/*",
     ]
   }
+}
+
+# ~~~~~~~~~~~~~~~~~ Upload the site content in the bucket ~~~~~~~~~~~~~
+
+resource "null_resource" "upload_files" {
+
+  provisioner "local-exec"  {
+      command = <<EOT
+        aws s3 sync ${var.cp-path} s3://${aws_s3_bucket.bucket1.bucket}/ 
+      EOT
+}
+ 
+depends_on = [aws_s3_bucket.bucket1 , aws_s3_bucket_policy.allow_access]
+ 
+}
+
+
+# ~~~~~~~~~~~ Configure the web hosting parameters in the bucket ~~~~~~~
+
+resource "aws_s3_bucket_website_configuration" "bucket" {
+  bucket = aws_s3_bucket.bucket1.id
+
+  index_document {
+    suffix = var.file-key
+  }
+
+  error_document {
+    key = var.file-key
+  }
+
+  depends_on = [aws_s3_bucket.bucket1]
+
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~ Configure CloudFont ~~~~~~~~~~~~~~~~~~~~~
