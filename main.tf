@@ -83,24 +83,28 @@ resource "aws_s3_bucket_acl" "bucket1-acl" {
 
 # ~~~~~~~~~~~~~~~~~~~ Configure The Bucket policy ~~~~~~~~~~~~~~~~~~
 
-resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
+resource "aws_s3_bucket_policy" "allow_access" {
   bucket = aws_s3_bucket.bucket1.id
-  policy = <<EOT
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "s3:*"
-      ],
-      "Effect": "Allow",
-      "Principal": "*",
-      "Resource": "${aws_s3_bucket.bucket1.arn}/*"
-    }
-  ]
-
+  policy = data.aws_iam_policy_document.allow_access_from_another_account.json
 }
-EOT
+
+data "aws_iam_policy_document" "allow_access_from_another_account" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      aws_s3_bucket.bucket1.arn,
+      "${aws_s3_bucket.bucket1.arn}/*",
+    ]
+  }
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~ Configure CloudFont ~~~~~~~~~~~~~~~~~~~~~
@@ -157,7 +161,7 @@ resource "aws_cloudfront_distribution" "web-distribution" {
 
   price_class = "PriceClass_200"
 
-  depends_on = [ aws_s3_bucket.bucket1 , null_resource.upload_files, aws_s3_bucket_acl.bucket1-acl ]
+  depends_on = [ aws_s3_bucket.bucket1 , null_resource.upload_files, aws_s3_bucket_acl.bucket1-acl, aws_s3_bucket_policy.allow_access ]
   
 }
 
