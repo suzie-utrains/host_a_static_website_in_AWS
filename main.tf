@@ -94,14 +94,8 @@ resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
         "s3:*"
       ],
       "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "s3:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.bucket1.arn}"
+      "Principal": "*",
+      "Resource": "${aws_s3_bucket.bucket1.arn}/*"
     }
   ]
 
