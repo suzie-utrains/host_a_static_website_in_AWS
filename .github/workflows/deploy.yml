@@ -18,12 +18,6 @@ jobs:
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.9.8  
- 
-    - name: Configure AWS CLI
-      run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region us-east-1  # Adjust this as needed
 
     - name: Terraform Init
       run: terraform init
@@ -68,7 +62,7 @@ jobs:
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.9.8 
-    - name: Restore Terraform State #Persist the workspace between executors
+    - name: Restore Terraform State #Persist the workspace between runners
       uses: actions/cache@v4
       with:
         path: .terraform
