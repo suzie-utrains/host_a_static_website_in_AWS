@@ -12,12 +12,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: 1.0.0  
+        terraform_version: 1.9.8  
 
     - name: Terraform Init
       run: terraform init
@@ -32,7 +32,7 @@ jobs:
       run: echo "Website URL is $(terraform output INFO)"
 
     - name: Cache Terraform State #To save the Terraform state file and workspace information between the apply and destroy jobs
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: .terraform
         key: ${{ runner.os }}-terraform-${{ github.sha }}
@@ -56,14 +56,14 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: 1.0.0  
+        terraform_version: 1.9.8 
     - name: Restore Terraform State #Persist the workspace between executors
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: .terraform
         key: ${{ runner.os }}-terraform-${{ github.sha }}
