@@ -1,9 +1,6 @@
 name: Deploy Static Website
 
-on:
-  push:
-    branches:
-      - main      
+on:     
   workflow_dispatch:   # To allow manual trigger for the destroy job  
 
 jobs:
