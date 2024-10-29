@@ -164,5 +164,5 @@ resource "aws_cloudfront_distribution" "web-distribution" {
 }
 
 output "INFO" {
-  value = "AWS Resources  has been provisioned. Go to http://${aws_cloudfront_distribution.web-distribution.domain_name}"
+  value = "AWS Resources  has been provisioned yes. Go to http://${aws_cloudfront_distribution.web-distribution.domain_name}"
 }
