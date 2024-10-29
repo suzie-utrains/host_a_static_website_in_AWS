@@ -80,7 +80,7 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
 resource "null_resource" "upload_files" {
 
   provisioner "local-exec"  {
-      command = "aws s3 sync ./${var.cp-path} s3://${aws_s3_bucket.bucket1.bucket}/ --recursive" 
+      command = "aws s3 sync ./${var.cp-path} s3://${aws_s3_bucket.bucket1.bucket}/" 
 }
  
 depends_on = [aws_s3_bucket.bucket1 , aws_s3_bucket_policy.allow_access]
