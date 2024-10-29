@@ -6,7 +6,7 @@ variable "region" {
 variable "bucket_name" {
     type = string
     description = "The name of the your bucket"
-    default = "suziebucket" # replace here by the name of your bucket  
+    default = "suziebucket1" # replace here by the name of your bucket  
 }
 
 variable "cp-path" {
