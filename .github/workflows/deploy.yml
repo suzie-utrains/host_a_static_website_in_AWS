@@ -4,92 +4,84 @@ on:
   push:
     branches:
       - main         
-  workflow_dispatch:   # To allow manual trigger for the destroy job  
+  workflow_dispatch:   # Permet de déclencher manuellement pour le destroy
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}  # Exécute ce job uniquement sur les pushs, pas sur les dispatch manuels
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.9.8  
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8  
 
-    - name: Install-aws-cli
-      uses: unfor19/install-aws-cli-action@v1
-      with:
+      - name: Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
+        with:
           version: 2                         
           verbose: false                     
           arch: amd64
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Terraform Init
+        run: terraform init
   
-    - name: Terraform Apply
-      run: terraform apply -auto-approve
-      env:
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-2
 
-    - name: Output website URL
-      run: echo "Website URL is $(terraform output INFO)"
+      - name: Output website URL
+        run: echo "Website URL is $(terraform output INFO)"
 
-    - name: Cache Terraform State #To save the Terraform state file and workspace information between the apply and destroy jobs
-      uses: actions/cache@v4
-      with:
-        path: .terraform
-        key: ${{ runner.os }}-terraform-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-terraform-
-
-  hold_destroy:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' }}  
-
-    steps:
-    - name: Await Approval to Destroy
-      run: |
-        echo "This is a manual hold stage for resource destruction."
-        echo "Please approve this action to proceed with destroying resources."
+      - name: Cache Terraform State # Enregistre l'état entre les jobs apply et destroy
+        uses: actions/cache@v4
+        with:
+          path: .terraform
+          key: ${{ runner.os }}-terraform-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
 
   destroy:
     runs-on: ubuntu-latest
-    needs: hold_destroy  # Wait for hold_destroy job
-    if: ${{ github.event_name == 'workflow_dispatch' }}  
+    if: ${{ github.event_name == 'workflow_dispatch' }}  # S'exécute uniquement en cas de déclenchement manuel
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.9.8 
-    - name: Restore Terraform State #Persist the workspace between runners
-      uses: actions/cache@v4
-      with:
-        path: .terraform
-        key: ${{ runner.os }}-terraform-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-terraform-
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8 
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Restore Terraform State # Restaure l'état sauvegardé
+        uses: actions/cache@v4
+        with:
+          path: .terraform
+          key: ${{ runner.os }}-terraform-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
 
-    - name: Install-aws-cli
-      uses: unfor19/install-aws-cli-action@v1
-      with:
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
+        with:
           version: 2                         
           verbose: false                     
           arch: amd64
 
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
