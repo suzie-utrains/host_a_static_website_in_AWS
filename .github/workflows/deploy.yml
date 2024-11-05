@@ -39,14 +39,20 @@ jobs:
 
       - name: Output website URL
         run: echo "Website URL is $(terraform output INFO)"
-
-      - name: Cache Terraform State # Enregistre l'état entre les jobs apply et destroy
-        uses: actions/cache@v4
+      - name: Upload Terraform state as artifact
+        uses: actions/upload-artifact@v3
         with:
+          name: terraform-state
           path: .terraform
-          key: ${{ runner.os }}-terraform-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-
+
+
+#      - name: Cache Terraform State # Enregistre l'état entre les jobs apply et destroy
+#        uses: actions/cache@v4
+#        with:
+#          path: .terraform
+#          key: ${{ runner.os }}-terraform-${{ github.sha }}
+#          restore-keys: |
+#            ${{ runner.os }}-terraform-
 
   destroy:
     runs-on: ubuntu-latest
@@ -61,23 +67,29 @@ jobs:
         with:
           terraform_version: 1.9.8 
 
-      - name: Restore Terraform State # Restaure l'état sauvegardé
-        uses: actions/cache@v4
-        with:
-          path: .terraform
-          key: ${{ runner.os }}-terraform-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-
-
-      - name: Terraform Init
-        run: terraform init
-
+#      - name: Restore Terraform State # Restaure l'état sauvegardé
+ #       uses: actions/cache@v4
+  #      with:
+   #       path: .terraform
+    #      key: ${{ runner.os }}-terraform-${{ github.sha }}
+     #     restore-keys: |
+      #      ${{ runner.os }}-terraform-
+            
       - name: Install AWS CLI
         uses: unfor19/install-aws-cli-action@v1
         with:
           version: 2                         
           verbose: false                     
-          arch: amd64
+          arch: amd64 
+
+      - name: Terraform Init
+        run: terraform init
+          
+      - name: Upload Terraform state as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-state
+          path: .terraform 
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
