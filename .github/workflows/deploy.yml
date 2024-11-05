@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main         
-  workflow_dispatch:   # Permet de déclencher manuellement pour le destroy
+  workflow_dispatch:   # Permet de déclencher manuellement pour le destroy job
 
 jobs:
   deploy:
